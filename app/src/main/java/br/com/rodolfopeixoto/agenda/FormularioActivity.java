@@ -17,7 +17,8 @@ public class FormularioActivity extends AppCompatActivity {
         buttonSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(FormularioActivity.this, "Botao clicado!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(FormularioActivity.this, "Aluno salvo.", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
 
