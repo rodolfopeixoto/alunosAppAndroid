@@ -8,18 +8,17 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+import java.util.List;
+
+import br.com.rodolfopeixoto.agenda.dao.AlunoDAO;
+import br.com.rodolfopeixoto.agenda.modelo.Aluno;
+
 public class ListaAlunosActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_lista_alunos);
-
-        String[] alunos = { "Rodolfo Peixoto", "Carla Bravo", "Amanda Oliveira", "Pedro Rodrigues", "Pedro Perrone"};
-        ListView listaAlunos = (ListView) findViewById(R.id.lista_alunos);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, alunos);
-        listaAlunos.setAdapter(adapter);
-
 
         Button buttonAddAluno = (Button) findViewById(R.id.lista_alunos_button);
         buttonAddAluno.setOnClickListener(new View.OnClickListener() {
@@ -29,5 +28,21 @@ public class ListaAlunosActivity extends AppCompatActivity {
                 startActivity(IntentVaiParaOFormulario);
             }
         });
+    }
+
+    private void carregaLista() {
+        AlunoDAO dao =  new AlunoDAO(this);
+        List<Aluno> alunos = dao.buscaAlunos();
+        dao.close();
+
+        ListView listaAlunos = (ListView) findViewById(R.id.lista_alunos);
+        ArrayAdapter<Aluno> adapter = new ArrayAdapter<Aluno>(this, android.R.layout.simple_list_item_1, alunos);
+        listaAlunos.setAdapter(adapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        carregaLista();
     }
 }
