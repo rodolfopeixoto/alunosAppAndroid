@@ -47,7 +47,7 @@
         android:numStars="5"
         android:id="@+id/form_nota"
         />
- 
+
 
   </LinearLayout>
 </ScrollView>
