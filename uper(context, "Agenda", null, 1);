@@ -1,0 +1,270 @@
+[1mdiff --git a/app/build.gradle b/app/build.gradle[m
+[1mindex 0d383d5..c0078a2 100644[m
+[1m--- a/app/build.gradle[m
+[1m+++ b/app/build.gradle[m
+[36m@@ -23,4 +23,5 @@[m [mdependencies {[m
+     compile fileTree(dir: 'libs', include: ['*.jar'])[m
+     testCompile 'junit:junit:4.12'[m
+     compile 'com.android.support:appcompat-v7:24.2.0'[m
+[32m+[m[32m    compile 'com.google.android.gms:play-services-appindexing:8.1.0'[m
+ }[m
+[1mdiff --git a/app/src/main/AndroidManifest.xml b/app/src/main/AndroidManifest.xml[m
+[1mindex 2a80eba..b2b1a66 100644[m
+[1m--- a/app/src/main/AndroidManifest.xml[m
+[1m+++ b/app/src/main/AndroidManifest.xml[m
+[36m@@ -15,7 +15,11 @@[m
+                 <category android:name="android.intent.category.LAUNCHER" />[m
+             </intent-filter>[m
+         </activity>[m
+[31m-        <activity android:name=".FormularioActivity"></activity>[m
+[32m+[m[32m        <activity android:name=".FormularioActivity"></activity><!-- ATTENTION: This was auto-generated to add Google Play services to your project for[m
+[32m+[m[32m     App Indexing.  See https://g.co/AppIndexing/AndroidStudio for more information. -->[m
+[32m+[m[32m        <meta-data[m
+[32m+[m[32m            android:name="com.google.android.gms.version"[m
+[32m+[m[32m            android:value="@integer/google_play_services_version" />[m
+     </application>[m
+ [m
+ </manifest>[m
+\ No newline at end of file[m
+[1mdiff --git a/app/src/main/java/br/com/rodolfopeixoto/agenda/ListaAlunosActivity.java b/app/src/main/java/br/com/rodolfopeixoto/agenda/ListaAlunosActivity.java[m
+[1mindex 02b4bbf..adb3265 100644[m
+[1m--- a/app/src/main/java/br/com/rodolfopeixoto/agenda/ListaAlunosActivity.java[m
+[1m+++ b/app/src/main/java/br/com/rodolfopeixoto/agenda/ListaAlunosActivity.java[m
+[36m@@ -1,6 +1,8 @@[m
+ package br.com.rodolfopeixoto.agenda;[m
+ [m
+ import android.content.Intent;[m
+[32m+[m[32mimport android.net.Uri;[m
+[32m+[m[32mimport android.provider.Browser;[m
+ import android.support.v7.app.AppCompatActivity;[m
+ import android.os.Bundle;[m
+ import android.view.ContextMenu;[m
+[36m@@ -13,6 +15,10 @@[m [mimport android.widget.Button;[m
+ import android.widget.ListView;[m
+ import android.widget.Toast;[m
+ [m
+[32m+[m[32mimport com.google.android.gms.appindexing.Action;[m
+[32m+[m[32mimport com.google.android.gms.appindexing.AppIndex;[m
+[32m+[m[32mimport com.google.android.gms.common.api.GoogleApiClient;[m
+[32m+[m
+ import java.util.List;[m
+ [m
+ import br.com.rodolfopeixoto.agenda.dao.AlunoDAO;[m
+[36m@@ -21,6 +27,11 @@[m [mimport br.com.rodolfopeixoto.agenda.modelo.Aluno;[m
+ public class ListaAlunosActivity extends AppCompatActivity {[m
+ [m
+     private ListView listaAlunos;[m
+[32m+[m[32m    /**[m
+[32m+[m[32m     * ATTENTION: This was auto-generated to implement the App Indexing API.[m
+[32m+[m[32m     * See https://g.co/AppIndexing/AndroidStudio for more information.[m
+[32m+[m[32m     */[m
+[32m+[m[32m    private GoogleApiClient client;[m
+ [m
+     @Override[m
+     protected void onCreate(Bundle savedInstanceState) {[m
+[36m@@ -52,10 +63,13 @@[m [mpublic class ListaAlunosActivity extends AppCompatActivity {[m
+ [m
+ [m
+         registerForContextMenu(listaAlunos);[m
+[32m+[m[32m        // ATTENTION: This was auto-generated to implement the App Indexing API.[m
+[32m+[m[32m        // See https://g.co/AppIndexing/AndroidStudio for more information.[m
+[32m+[m[32m        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();[m
+     }[m
+ [m
+     private void carregaLista() {[m
+[31m-        AlunoDAO dao =  new AlunoDAO(this);[m
+[32m+[m[32m        AlunoDAO dao = new AlunoDAO(this);[m
+         List<Aluno> alunos = dao.buscaAlunos();[m
+         dao.close();[m
+ [m
+[36m@@ -71,24 +85,90 @@[m [mpublic class ListaAlunosActivity extends AppCompatActivity {[m
+ [m
+     @Override[m
+     public void onCreateContextMenu(ContextMenu menu, View v, final ContextMenu.ContextMenuInfo menuInfo) {[m
+[31m-       MenuItem deletar = menu.add("Deletar");[m
+ [m
+[31m-        deletar.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener(){[m
+[31m-            @Override[m
+[31m-            public boolean onMenuItemClick(MenuItem item){[m
+[32m+[m[32m        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;[m
+[32m+[m[32m        final Aluno aluno = (Aluno) listaAlunos.getItemAtPosition(info.position);[m
+[32m+[m
+[32m+[m
+[32m+[m[32m        MenuItem itemSite = menu.add("Visualizar site");[m
+[32m+[m[32m        MenuItem itemSMS = menu.add("Enviar SMS");[m
+[32m+[m[32m        MenuItem itemMAP = menu.add("Visualizar no mapa");[m
+[32m+[m[32m        MenuItem deletar = menu.add("Deletar");[m
+[32m+[m
+[32m+[m[32m        Intent intentSMS = new Intent(Intent.ACTION_VIEW);[m
+[32m+[m[32m        Intent intentSite = new Intent(Intent.ACTION_VIEW);[m
+[32m+[m[32m        Intent intentMAP = new Intent(Intent.ACTION_VIEW);[m
+[32m+[m
+[32m+[m[32m        // Actions[m
+[32m+[m
+[32m+[m[32m        String site = aluno.getSite();[m
+[32m+[m
+[32m+[m[32m        if (!site.startsWith("http://")) {[m
+[32m+[m[32m            site = "http://" + site;[m
+[32m+[m[32m        }[m
+[32m+[m
+[32m+[m[32m        intentSite.setData(Uri.parse(site));[m
+[32m+[m[32m        itemSite.setIntent(intentSite);[m
+ [m
+[31m-                AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;[m
+[31m-                Aluno aluno = (Aluno) listaAlunos.getItemAtPosition(info.position);[m
+[32m+[m[32m        intentSMS.setData(Uri.parse("sms:" + aluno.getTelefone()));[m
+[32m+[m[32m        itemSMS.setIntent(intentSMS);[m
+[32m+[m
+[32m+[m[32m        intentMAP.setData(Uri.parse("geo:0,0?q=" + aluno.getEndereco()));[m
+[32m+[m[32m        itemMAP.setIntent(intentMAP);[m
+[32m+[m
+[32m+[m[32m        deletar.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {[m
+[32m+[m[32m            @Override[m
+[32m+[m[32m            public boolean onMenuItemClick(MenuItem item) {[m
+ [m
+                 AlunoDAO dao = new AlunoDAO(ListaAlunosActivity.this);[m
+                 dao.deleta(aluno);[m
+ [m
+                 carregaLista();[m
+ [m
+[31m-                Toast.makeText(ListaAlunosActivity.this, "Deletar o aluno " + aluno.getNome(), Toast.LENGTH_SHORT ).show();[m
+[32m+[m[32m                Toast.makeText(ListaAlunosActivity.this, "Deletar o aluno " + aluno.getNome(), Toast.LENGTH_SHORT).show();[m
+                 return false;[m
+             }[m
+         });[m
+ [m
+     }[m
+[32m+[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public void onStart() {[m
+[32m+[m[32m        super.onStart();[m
+[32m+[m
+[32m+[m[32m        // ATTENTION: This was auto-generated to implement the App Indexing API.[m
+[32m+[m[32m        // See https://g.co/AppIndexing/AndroidStudio for more information.[m
+[32m+[m[32m        client.connect();[m
+[32m+[m[32m        Action viewAction = Action.newAction([m
+[32m+[m[32m                Action.TYPE_VIEW, // TODO: choose an action type.[m
+[32m+[m[32m                "ListaAlunos Page", // TODO: Define a title for the content shown.[m
+[32m+[m[32m                // TODO: If you have web page content that matches this app activity's content,[m
+[32m+[m[32m                // make sure this auto-generated web page URL is correct.[m
+[32m+[m[32m                // Otherwise, set the URL to null.[m
+[32m+[m[32m                Uri.parse("http://host/path"),[m
+[32m+[m[32m                // TODO: Make sure this auto-generated app URL is correct.[m
+[32m+[m[32m                Uri.parse("android-app://br.com.rodolfopeixoto.agenda/http/host/path")[m
+[32m+[m[32m        );[m
+[32m+[m[32m        AppIndex.AppIndexApi.start(client, viewAction);[m
+[32m+[m[32m    }[m
+[32m+[m
+[32m+[m[32m    @Override[m
+[32m+[m[32m    public void onStop() {[m
+[32m+[m[32m        super.onStop();[m
+[32m+[m
+[32m+[m[32m        // ATTENTION: This was auto-generated to implement the App Indexing API.[m
+[32m+[m[32m        // See https://g.co/AppIndexing/AndroidStudio for more information.[m
+[32m+[m[32m        Action viewAction = Action.newAction([m
+[32m+[m[32m                Action.TYPE_VIEW, // TODO: choose an action type.[m
+[32m+[m[32m                "ListaAlunos Page", // TODO: Define a title for the content shown.[m
+[32m+[m[32m                // TODO: If you have web page content that matches this app activity's content,[m
+[32m+[m[32m                // make sure this auto-generated web page URL is correct.[m
+[32m+[m[32m                // Otherwise, set the URL to null.[m
+[32m+[m[32m                Uri.parse("http://host/path"),[m
+[32m+[m[32m                // TODO: Make sure this auto-generated app URL is correct.[m
+[32m+[m[32m                Uri.parse("android-app://br.com.rodolfopeixoto.agenda/http/host/path")[m
+[32m+[m[32m        );[m
+[32m+[m[32m        AppIndex.AppIndexApi.end(client, viewAction);[m
+[32m+[m[32m        client.disconnect();[m
+[32m+[m[32m    }[m
+ }[m
+[1mdiff --git a/app/src/main/java/br/com/rodolfopeixoto/agenda/dao/AlunoDAO.java b/app/src/main/java/br/com/rodolfopeixoto/agenda/dao/AlunoDAO.java[m
+[1mindex d9c1b57..acee63f 100644[m
+[1m--- a/app/src/main/java/br/com/rodolfopeixoto/agenda/dao/AlunoDAO.java[m
+[1m+++ b/app/src/main/java/br/com/rodolfopeixoto/agenda/dao/AlunoDAO.java[m
+[36m@@ -21,16 +21,16 @@[m [mpublic class AlunoDAO extends SQLiteOpenHelper {[m
+     }[m
+ [m
+     @Override[m
+[31m-    public void onCreate(SQLiteDatabase sqLiteDatabase) {[m
+[31m-        String sql = "CREATE TABLE Alunos (id INTEGER PRIMARY KEY, nome TEXT NOT NULL, endereco TEXT, telefone TEXT, site TEXT, nota REAL);";[m
+[31m-        sqLiteDatabase.execSQL(sql);[m
+[32m+[m[32m    public void onCreate(SQLiteDatabase db) {[m
+[32m+[m[32m        String sql = "CREATE TABLE Alunos (id INTEGER PRIMARY KEY, nome TEXT NOT NULL, endereco TEXT, telefone TEXT, site TEXT, nota REAL)";[m
+[32m+[m[32m        db.execSQL(sql);[m
+     }[m
+ [m
+     @Override[m
+[31m-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {[m
+[32m+[m[32m    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {[m
+         String sql = "DROP TABLE IF EXISTS Alunos";[m
+[31m-        sqLiteDatabase.execSQL(sql);[m
+[31m-        onCreate(sqLiteDatabase);[m
+[32m+[m[32m        db.execSQL(sql);[m
+[32m+[m[32m        onCreate(db);[m
+     }[m
+ [m
+     public void insere(Aluno aluno) {[m
+[36m@@ -38,7 +38,7 @@[m [mpublic class AlunoDAO extends SQLiteOpenHelper {[m
+ [m
+         ContentValues dados = pegaDadosDoAluno(aluno);[m
+ [m
+[31m-        db.insert("Alunos", null, dados );[m
+[32m+[m[32m        db.insert("Alunos", null, dados);[m
+     }[m
+ [m
+     @NonNull[m
+[36m@@ -47,40 +47,34 @@[m [mpublic class AlunoDAO extends SQLiteOpenHelper {[m
+         dados.put("nome", aluno.getNome());[m
+         dados.put("endereco", aluno.getEndereco());[m
+         dados.put("telefone", aluno.getTelefone());[m
+[31m-        dados.put("site", aluno.getTelefone());[m
+[32m+[m[32m        dados.put("site", aluno.getSite());[m
+         dados.put("nota", aluno.getNota());[m
+         return dados;[m
+     }[m
+ [m
+     public List<Aluno> buscaAlunos() {[m
+[31m-        String sql = "SELECT * FROM Alunos;";[m
+[32m+[m[32m        String sql = "SELECT * from Alunos;";[m
+         SQLiteDatabase db = getReadableDatabase();[m
+         Cursor c = db.rawQuery(sql, null);[m
+ [m
+[31m-        List<Aluno> alunos = new ArrayList<Aluno>();[m
+[31m-[m
+[32m+[m[32m        List<Aluno> alunos = new ArrayList<>();[m
+         while(c.moveToNext()){[m
+             Aluno aluno = new Aluno();[m
+[31m-[m
+             aluno.setId(c.getLong(c.getColumnIndex("id")));[m
+             aluno.setNome(c.getString(c.getColumnIndex("nome")));[m
+             aluno.setEndereco(c.getString(c.getColumnIndex("endereco")));[m
+             aluno.setTelefone(c.getString(c.getColumnIndex("telefone")));[m
+             aluno.setSite(c.getString(c.getColumnIndex("site")));[m
+             aluno.setNota(c.getDouble(c.getColumnIndex("nota")));[m
+[31m-[m
+             alunos.add(aluno);[m
+         }[m
+         c.close();[m
+[31m-[m
+         return alunos;[m
+     }[m
+ [m
+     public void deleta(Aluno aluno) {[m
+[31m-      SQLiteDatabase db = getWritableDatabase();[m
+[31m-[m
+[32m+[m[32m        SQLiteDatabase db = getWritableDatabase();[m
+         String[] params = {aluno.getId().toString()};[m
+[31m-[m
+         db.delete("Alunos", "id = ?", params);[m
+     }[m
+ [m
+[36m@@ -89,9 +83,7 @@[m [mpublic class AlunoDAO extends SQLiteOpenHelper {[m
+ [m
+         ContentValues dados = pegaDadosDoAluno(aluno);[m
+ [m
+[31m-[m
+[31m-        String[] params = { aluno.getId().toString() };[m
+[31m-[m
+[31m-        db.update("Aluno", dados, "id = ?", params);[m
+[32m+[m[32m        String[] params = {aluno.getId().toString()};[m
+[32m+[m[32m        db.update("Alunos", dados, "id = ?", params);[m
+     }[m
+ }[m
