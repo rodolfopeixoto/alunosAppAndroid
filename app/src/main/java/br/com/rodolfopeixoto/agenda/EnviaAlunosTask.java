@@ -1,5 +1,6 @@
 package br.com.rodolfopeixoto.agenda;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.Toast;
@@ -17,9 +18,15 @@ import br.com.rodolfopeixoto.agenda.modelo.Aluno;
 public class EnviaAlunosTask extends AsyncTask<Object,Object,String> {
 
     private Context context;
+    private ProgressDialog progressDialog;
 
     public EnviaAlunosTask(Context context) {
         this.context = context;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        progressDialog = ProgressDialog.show(context, "Aguarde", "Enviando alunos...", true, true);
     }
 
     @Override
@@ -43,6 +50,7 @@ public class EnviaAlunosTask extends AsyncTask<Object,Object,String> {
 
     @Override
     protected void onPostExecute(String resposta) {
+        progressDialog.dismiss();
         Toast.makeText(context, resposta, Toast.LENGTH_LONG).show();
     }
 }
