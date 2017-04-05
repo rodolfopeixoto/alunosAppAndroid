@@ -35,8 +35,6 @@ public class EnviaAlunosTask extends AsyncTask {
         WebClient client = new WebClient();
         String resposta = client.post(json);
 
-
-
 //        Toast.makeText(context, resposta, Toast.LENGTH_LONG).show();
 
         return resposta;
