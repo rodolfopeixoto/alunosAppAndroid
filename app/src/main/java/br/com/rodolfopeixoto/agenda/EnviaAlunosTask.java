@@ -42,7 +42,7 @@ public class EnviaAlunosTask extends AsyncTask<Object,Object,String> {
     }
 
     @Override
-    protected void onPostExecute(String o) {
-        Toast.makeText(context, (String) o, Toast.LENGTH_LONG).show();
+    protected void onPostExecute(String resposta) {
+        Toast.makeText(context, resposta, Toast.LENGTH_LONG).show();
     }
 }

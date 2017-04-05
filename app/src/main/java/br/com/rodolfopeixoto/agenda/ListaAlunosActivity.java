@@ -93,7 +93,7 @@ public class ListaAlunosActivity extends AppCompatActivity {
 
         switch (item.getItemId()){
             case R.id.menu_enviar_notas:
-
+                new EnviaAlunosTask(this).execute();
                 break;
         }
 
