@@ -14,7 +14,8 @@ import br.com.rodolfopeixoto.agenda.modelo.Aluno;
  * Created by rodolfopeixoto on 05/04/17.
  */
 
-public class EnviaAlunosTask extends AsyncTask {
+public class EnviaAlunosTask extends AsyncTask<Object,Object,String> {
+
     private Context context;
 
     public EnviaAlunosTask(Context context) {
@@ -22,7 +23,7 @@ public class EnviaAlunosTask extends AsyncTask {
     }
 
     @Override
-    protected Object doInBackground(Object[] objects) {
+    protected String doInBackground(Object... objects) {
 
 
         AlunoDAO dao = new AlunoDAO(context);
@@ -41,7 +42,7 @@ public class EnviaAlunosTask extends AsyncTask {
     }
 
     @Override
-    protected void onPostExecute(Object o) {
+    protected void onPostExecute(String o) {
         Toast.makeText(context, (String) o, Toast.LENGTH_LONG).show();
     }
 }
