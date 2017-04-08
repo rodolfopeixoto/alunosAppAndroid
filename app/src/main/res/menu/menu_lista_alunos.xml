@@ -8,4 +8,10 @@
         app:showAsAction="always"
         />
 
+    <item android:id="@+id/menu_baixar_provas"
+       android:title="Baixar Provas"
+        android:icon="@mipmap/ic_receber"
+        app:showAsAction="always"
+        />
+
 </menu>
