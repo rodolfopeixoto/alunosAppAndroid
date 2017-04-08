@@ -38,7 +38,8 @@
             android:value="@integer/google_play_services_version" />
 
         <activity android:name=".ProvasActivity" />
-        <activity android:name=".DetalhesProvaActivity"></activity>
+        <activity android:name=".DetalhesProvaActivity" />
+        <activity android:name=".ProvasTabletActivity"></activity>
     </application>
 
 </manifest>
